@@ -1,9 +1,13 @@
 package com.vault.controller;
 
+import com.vault.dao.UserDao;
 import com.vault.dto.UserDto;
+import com.vault.entity.User;
 import com.vault.service.UserService;
 import com.vault.utils.Constants;
 import com.vault.utils.Utils;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +23,26 @@ public class HomeController {
 
     public HomeController(UserService userService) {
         this.userService = userService;
+    }
+
+    //seeds a default admin on startup so the app is usable on a fresh database
+    @Bean
+    public CommandLineRunner loadDemoData(UserDao userDao) {
+        return args -> {
+            if (Objects.isNull(userDao.findUserByUsername("admin"))) {
+                User admin = User.builder()
+                        .username("admin")
+                        .password(Constants.PASSWORD_HASHING_NOOP + "1234")
+                        .role(Constants.ADMIN_ROLE)
+                        .firstName("admin")
+                        .lastName("admin")
+                        .email("nimra@gmail.com")
+                        .cnic("3453234535")
+                        .isActive(Constants.OPTION_YES)
+                        .build();
+                userDao.save(admin);
+            }
+        };
     }
 
     @GetMapping("/login")
