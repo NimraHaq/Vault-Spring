@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funds Transfer &middot; Vault</title>
+    <link th:href="@{/css/styles.css}" rel="stylesheet" />
+</head>
+<body class="page-form">
+
+<div class="form-wrap">
+    <div class="form-head">
+        <h1>Funds Transfer</h1>
+        <p>Move funds from your card to another card.</p>
+    </div>
+
+    <div class="form-body">
+
+        <!-- rejected by the server-side checks -->
+        <div class="alert alert-error" th:if="${param.invalidAmount}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>Transfer amount must be greater than zero.</span>
+        </div>
+        <div class="alert alert-error" th:if="${param.sameCard}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>Funds cannot be transferred to the same card.</span>
+        </div>
+        <div class="alert alert-error" th:if="${param.cardNotFound}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>The beneficiary card number does not exist.</span>
+        </div>
+        <div class="alert alert-error" th:if="${param.fundsNotFound}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>No funds record found for your card.</span>
+        </div>
+        <div class="alert alert-error" th:if="${param.insufficientFunds}">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span>Insufficient balance on your card for this transfer.</span>
+        </div>
+
+        <!-- POST form; th:action injects the CSRF token automatically -->
+        <form th:action="@{/customer/processFundsTransfer}" method="post">
+
+            <input type="hidden" name="fromCardNo" th:value="${fromCardNo}" />
+
+            <div class="field">
+                <label for="fromCardNoDisplay">From Card Number</label>
+                <input type="text" id="fromCardNoDisplay" th:value="${fromCardNo}" disabled />
+            </div>
+
+            <div class="field">
+                <label for="toCardNo">To Card Number</label>
+                <input type="number" id="toCardNo" name="toCardNo"
+                       placeholder="e.g. 12345678901" autocomplete="off" required />
+            </div>
+
+            <div class="field">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount"
+                       min="0.01" step="0.01" placeholder="e.g. 1000.00"
+                       autocomplete="off" required />
+                <small>Amount must be greater than zero.</small>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Transfer</button>
+                <a th:href="@{/customer/dashboard}" class="btn btn-ghost">Cancel</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>
