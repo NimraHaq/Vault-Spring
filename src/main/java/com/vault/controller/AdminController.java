@@ -2,6 +2,7 @@ package com.vault.controller;
 
 import com.vault.dto.UserDto;
 import com.vault.enums.CardStatus;
+import com.vault.service.CardFundsService;
 import com.vault.service.CardService;
 import com.vault.service.CustomerService;
 import com.vault.service.UserService;
@@ -28,12 +29,15 @@ public class AdminController {
     private UserService userService;
     private CustomerService customerService;
     private CardService cardService;
+    private CardFundsService cardFundsService;
 
     @Autowired
-    public AdminController(UserService userService, CustomerService customerService, CardService cardService) {
+    public AdminController(UserService userService, CustomerService customerService, CardService cardService,
+                           CardFundsService cardFundsService) {
         this.userService = userService;
         this.customerService = customerService;
         this.cardService = cardService;
+        this.cardFundsService = cardFundsService;
     }
 
     //instead of using StringTrimmerEditor, use @NotBlank annotion
@@ -91,9 +95,7 @@ public class AdminController {
             return "redirect:/admin/showFormToDeposit?cardNo=" + cardNo + "&amountTooLarge";
         }
 
-        System.out.println("amount for deposite is : " + amount + "card no = " + cardNo);
-
-        //TODO: update card_funds for this cardNo with the deposited amount
+        cardFundsService.depositFundsInCard(cardNo, amount);
 
         model.addAttribute("confirmationMsg", "Amount " + amount + " deposited successfully.");
         model.addAttribute("goBackLink", "/admin/showCustomers");

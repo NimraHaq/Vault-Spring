@@ -47,11 +47,6 @@ public class CustomerServiceImpl extends CustomerService {
         return cardService.getCardsByChId(customerDao.findCustomerByChId(chId));
     }
 
-    @Override
-    public List<TransactionDto> getAllCustomerTransactions(int chId) {
-        return cardService.getAllCardsTransactions(customerDao.findCustomerByChId(chId));
-    }
-
     protected static Customer customerDtoToEntityMapping(CustomerDto customerDto){
         Customer customer = Customer.builder().chId(customerDto.getChId()).defaultCardSrno(customerDto.getDefaultCardSrno())
                 .registeredCards(customerDto.getRegisteredCards()).isActive(customerDto.getIsActive())

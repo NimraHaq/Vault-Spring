@@ -9,8 +9,8 @@ import java.util.List;
 
 @RepositoryRestResource(path = "cards")
 public interface CardDao extends JpaRepository<Card, Long> {
-    Card findByCardNo(long cardNo);
-    int deleteByCardNo(long cardNo);
+    Card findByCardNo(Long cardNo);
+    List<Card> findByCardNoIn(List<Long> cardNo);
+    int deleteByCardNo(Long cardNo);
     List<Card> findCardsByCustomer(Customer customer);
-
 }

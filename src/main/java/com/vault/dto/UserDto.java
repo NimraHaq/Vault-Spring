@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserDto {
 
-    private int id;
+    private Integer id;
 
 
     @NotBlank(message = "Username is required.")

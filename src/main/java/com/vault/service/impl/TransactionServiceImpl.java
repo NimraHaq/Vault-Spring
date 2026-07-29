@@ -4,11 +4,14 @@ import com.vault.dao.TransactionDao;
 import com.vault.dto.TransactionDto;
 import com.vault.entity.Card;
 import com.vault.entity.Transaction;
+import com.vault.enums.ServiceIds;
 import com.vault.service.CardService;
 import com.vault.service.TransactionService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +33,16 @@ public class TransactionServiceImpl extends TransactionService {
         Transaction transactionEntity = transactionDtoToEntityMapping(transaction);
         transactionEntity.setCard(card);
         return transactionEntityToDtoMapping(transactionDao.save(transactionEntity));
+    }
+
+    @Override
+    public TransactionDto createTransaction(Card card, BigDecimal amount, ServiceIds serviceId) {
+        TransactionDto transactionDto = TransactionDto.builder().cardNo(card.getCardNo())
+                .serviceId(serviceId.getServiceId())
+                .amountProcessed(Objects.isNull(amount) ? BigDecimal.ZERO : amount)
+                .serviceCharges(BigDecimal.ZERO)
+                .build();
+        return addTransaction(transactionDto, card);
     }
 
     protected static Transaction transactionDtoToEntityMapping(TransactionDto transactionDto){

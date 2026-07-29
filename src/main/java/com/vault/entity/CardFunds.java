@@ -33,7 +33,8 @@ public class CardFunds {
     @Builder.Default
     private BigDecimal cardBalanceOnHold = BigDecimal.ZERO;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //not cascading persist/remove, because the card is not created or deleted by its funds row
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     @JoinColumn(name = "card_srno", referencedColumnName = "card_srno", foreignKey = @ForeignKey(name = "FK_cards"))
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

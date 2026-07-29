@@ -18,9 +18,12 @@ public abstract class CardService {
 
     abstract public List<CardDto> getCardsByChId(Customer customer);
 
+    //null when no such card exists in the DB
+    abstract public CardDto getCardByCardNo(long cardNo);
+
     abstract public List<CardDto> getAllCards();
 
     abstract public CardDto blockCard(long cardNo);
 
-    abstract public List<TransactionDto> getAllCardsTransactions(Customer customer);
+    abstract public List<TransactionDto> getAllCardsTransactions(List<Long> cardNumbers);
 }

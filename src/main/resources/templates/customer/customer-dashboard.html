@@ -26,10 +26,8 @@
 <nav id="sidebar-wrapper">
     <ul class="sidebar-nav">
         <li class="sidebar-brand"><a href="#page-top">Customer Dashboard</a></li>
-        <li class="sidebar-nav-item"><a th:href="@{/customer/showFormToAddAdmin}">Funds Transfer</a></li>
         <li class="sidebar-nav-item"><a th:href="@{/customer/showCustomerCards(id=${user.getCustomerDto().getChId()})}">Cards</a></li>
-        <li class="sidebar-nav-item"><a th:href="@{/customer/showFormToDeleteUser}">Transactions</a></li>
-        <li class="sidebar-nav-item"><a th:href="@{/customer/showFormToAddCustomer}">Profile Update</a></li>
+        <li class="sidebar-nav-item"><a th:href="@{/customer/showFormToAddCustomer}">Change Password</a></li>
 
         <li class="sidebar-nav-item">
             <form th:action="@{/logout}" method="post" style="display:inline;">

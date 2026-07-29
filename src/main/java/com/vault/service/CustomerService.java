@@ -11,6 +11,5 @@ public abstract class CustomerService {
     abstract public UserDto addCustomer(UserDto userDto);
     abstract public CustomerDto getCustomerByChId(int chId);
     abstract public List<CardDto> getCardByChId(int chId);
-    abstract public List<TransactionDto> getAllCustomerTransactions(int chId);
 }
 

@@ -10,6 +10,7 @@ import com.vault.enums.CardStatus;
 import com.vault.enums.ServiceIds;
 import com.vault.exceptions.CardCouldNotBeGeneratedException;
 import com.vault.exceptions.CardNotFoundException;
+import com.vault.service.CardFundsService;
 import com.vault.service.CardService;
 import com.vault.service.TransactionService;
 import com.vault.utils.Constants;
@@ -17,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,10 +29,12 @@ import java.util.stream.Collectors;
 public class CardServiceImpl extends CardService {
     private CardDao cardDao;
     private TransactionService transactionService;
+    private CardFundsService cardFundsService;
 
-    public CardServiceImpl(CardDao cardDao, TransactionService transactionService) {
+    public CardServiceImpl(CardDao cardDao, TransactionService transactionService, CardFundsService cardFundsService) {
         this.cardDao = cardDao;
         this.transactionService = transactionService;
+        this.cardFundsService = cardFundsService;
     }
     @Override
     public CardDto addCard(UserDto user) {
@@ -40,21 +44,17 @@ public class CardServiceImpl extends CardService {
             try {
                 card.setCardNo(generateRandomNumber());
                 Optional<Card> cardEntity = Optional.ofNullable(cardDao.saveAndFlush(mapToCardEntity(card)));
-                cardEntity.ifPresent(c -> createTransaction(c));
-                return cardEntity.isPresent() ? mapToCardDto(cardEntity.get()) : null;   // flush forces the DB to check now
+                cardEntity.ifPresent(c -> {
+                    cardFundsService.addCardFunds(c);   // funds row with zero balances
+                    transactionService.createTransaction(c, BigDecimal.ZERO, ServiceIds.ADD_CARD);
+                });
+                return cardEntity.isPresent() ? mapToCardDto(cardEntity.get()) : null;
             } catch (DataIntegrityViolationException e) {
                 attempts++;   // if not a unique card number → try a new number
             }
         }
         throw new CardCouldNotBeGeneratedException("Could not generate a unique card number");
     }
-
-    private TransactionDto createTransaction(Card card){
-        TransactionDto transactionDto = TransactionDto.builder().cardNo(card.getCardNo()).serviceId(ServiceIds.ADD_CARD.getServiceId())
-                .build();
-        return transactionService.addTransaction(transactionDto, card);
-    }
-
 
     private CardDto generateCard(UserDto user){
         CardDto cardDto = new CardDto();
@@ -86,6 +86,12 @@ public class CardServiceImpl extends CardService {
     }
 
     @Override
+    public CardDto getCardByCardNo(long cardNo) {
+        Card card = cardDao.findByCardNo(cardNo);
+        return Objects.isNull(card) ? null : mapToCardDto(card);
+    }
+
+    @Override
     public List<CardDto> getAllCards() {
         return cardDao.findAll().stream().map(this::mapToCardDto).collect(Collectors.toList());
     }
@@ -103,8 +109,8 @@ public class CardServiceImpl extends CardService {
     }
 
     @Override
-    public List<TransactionDto> getAllCardsTransactions(Customer customer) {
-        List<Card> cardsList = cardDao.findCardsByCustomer(customer);
+    public List<TransactionDto> getAllCardsTransactions(List<Long> cardNumbers) {
+        List<Card> cardsList = cardDao.findByCardNoIn(cardNumbers);
         return transactionService.getAllCardsTransactions(cardsList);
     }
 

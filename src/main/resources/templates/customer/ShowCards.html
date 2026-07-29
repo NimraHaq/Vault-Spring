@@ -40,6 +40,7 @@
                 <th>Active</th>
                 <th>CH ID</th>
                 <th>Transactions</th>
+                <th>Funds Transfer</th>
             </tr>
             </thead>
             <tbody>
@@ -52,6 +53,9 @@
                 <td th:text="${card.customerDto.chId}"></td>
                 <td>
                     <a class="btn btn-primary btn-sm" th:href="@{/customer/showCardTransactions(cardNo=${card.cardNo})}">Transactions</a>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm" th:href="@{/customer/showFundsTransferForm(cardNo=${card.cardNo})}">Transfer</a>
                 </td>
             </tr>
             </tbody>
